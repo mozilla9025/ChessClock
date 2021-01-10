@@ -1,0 +1,1 @@
+enum StepTurn { WHITE, BLACK }
