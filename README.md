@@ -1,4 +1,4 @@
-# flutter_app
+# Chess Clock
 
 A new Flutter application.
 
