@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/card.dart';
+import 'package:flutter_app/constants.dart';
+import 'package:flutter_app/dialog_box.dart';
 import 'package:flutter_app/step_turn.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -89,80 +91,108 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      child: Container(
-        decoration: BoxDecoration(color: Color(0xFF4D4F53)),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: SideCard(
-                duration: 300000,
-                isReset: _isReset,
-                textColor: Colors.black,
-                rotations: 2,
-                color: Colors.white,
-                isPlaying: _isPlaying,
-                onTapped: _handleWhiteTurnCommit,
-                isCurrentStep: _stepTurn == StepTurn.WHITE,
+      child: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: SideCard(
+                  duration: 300000,
+                  isReset: _isReset,
+                  textColor: Colors.black,
+                  rotations: 2,
+                  color: const Color(0xFFF2F2F2),
+                  isPlaying: _isPlaying,
+                  onTapped: _handleWhiteTurnCommit,
+                  isCurrentStep: _stepTurn == StepTurn.WHITE,
+                ),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    color: Colors.white,
-                    enableFeedback: true,
-                    iconSize: 48.0,
-                    icon: Icon(
+              Expanded(
+                flex: 2,
+                child: SideCard(
+                  duration: 300000,
+                  isReset: _isReset,
+                  textColor: Colors.white,
+                  rotations: 0,
+                  color: const Color(0xFF1B1B1B),
+                  isPlaying: _isPlaying,
+                  onTapped: _handleBlackTurnCommit,
+                  isCurrentStep: _stepTurn == StepTurn.BLACK,
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildButton(
+                    Icon(
+                      Icons.timer_rounded,
+                      color: const Color(0xFF28231F),
+                    ),
+                    _showTimePicker),
+                _buildButton(
+                    Icon(
                       _isPlaying
                           ? Icons.pause_rounded
                           : Icons.play_arrow_rounded,
-                      color: Colors.white,
+                      color: const Color(0xFF28231F),
                     ),
-                    onPressed: _togglePlaying,
+                    _togglePlaying),
+                _buildButton(
+                  Icon(
+                    Icons.refresh_rounded,
+                    color: const Color(0xFF28231F),
                   ),
-                  Container(
-                    width: 24.0,
-                    height: 24.0,
-                    decoration: BoxDecoration(
-                      color: _stepTurn == StepTurn.WHITE
-                          ? Colors.white
-                          : Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  IconButton(
-                    color: Colors.white,
-                    enableFeedback: true,
-                    iconSize: 48.0,
-                    icon: Icon(
-                      Icons.refresh_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: _reset,
-                  ),
-                ],
-              ),
+                  _reset,
+                ),
+              ],
             ),
-            Expanded(
-              flex: 2,
-              child: SideCard(
-                duration: 300000,
-                isReset: _isReset,
-                textColor: Colors.white,
-                rotations: 0,
-                color: Colors.black,
-                isPlaying: _isPlaying,
-                onTapped: _handleBlackTurnCommit,
-                isCurrentStep: _stepTurn == StepTurn.BLACK,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildButton(Icon icon, Function onPressed) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFDBDAD8),
+            blurRadius: 2.0,
+            spreadRadius: 0.25,
+          )
+        ],
+      ),
+      padding: EdgeInsets.all(8.0),
+      child: IconButton(
+        enableFeedback: true,
+        iconSize: 36.0,
+        icon: icon,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  void _showTimePicker() async {
+    await showDialog(
+      context: context,
+      barrierColor: const Color(0x20000000),
+      builder: (BuildContext context) {
+        return CustomDialogBox(
+          title: "Pick game duration",
+          text: "Confirm",
+          currentTime: Constants.twoMinInMs,
+          onPicked: (value) => {},
+        );
+      },
     );
   }
 }
