@@ -12,6 +12,7 @@ class SideCard extends StatefulWidget {
   final bool isPlaying;
   final bool isCurrentStep;
   final VoidCallback onTapped;
+  final VoidCallback onTimeIsOver;
 
   SideCard({
     Key key,
@@ -23,6 +24,7 @@ class SideCard extends StatefulWidget {
     @required this.isCurrentStep,
     @required this.isPlaying,
     @required this.onTapped,
+    @required this.onTimeIsOver,
   }) : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class SideCard extends StatefulWidget {
 }
 
 class _SideCardState extends State<SideCard> {
-  int _timePassed = 0;
+  int _timePassed = -100;
   bool _timerIsRunning = false;
   int _turnCount = 0;
   final DateFormat _dateFormat = DateFormat("mm:ss");
@@ -64,6 +66,9 @@ class _SideCardState extends State<SideCard> {
   void _updateTime() {
     setState(() {
       _timePassed += 100;
+      if (_timePassed >= widget.duration) {
+        widget.onTimeIsOver();
+      }
     });
   }
 
@@ -76,8 +81,7 @@ class _SideCardState extends State<SideCard> {
     widget.onTapped();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void _updateState() {
     if (widget.isPlaying && widget.isCurrentStep) {
       _setTimer();
     } else {
@@ -86,10 +90,20 @@ class _SideCardState extends State<SideCard> {
 
     if (widget.isReset) {
       setState(() {
-        _timePassed = 0;
+        _timePassed = -100;
       });
     }
+  }
 
+  @override
+  void initState() {
+    super.initState();
+    _updateState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _updateState();
     return GestureDetector(
       onTap: _handleTap,
       child: RotatedBox(
@@ -100,16 +114,19 @@ class _SideCardState extends State<SideCard> {
             children: <Widget>[
               Align(
                 alignment: Alignment.center,
-                child: Text(
-                  _dateFormat.format(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      widget.duration - _timePassed,
+                child: Transform.scale(
+                  scale: widget.isCurrentStep ? 1.25 : 1,
+                  child: Text(
+                    _dateFormat.format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                        widget.duration - _timePassed,
+                      ),
                     ),
-                  ),
-                  style: TextStyle(
-                    fontSize: 64.0,
-                    color: widget.textColor ?? Colors.red,
-                    fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 64.0,
+                      color: widget.textColor ?? Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               )

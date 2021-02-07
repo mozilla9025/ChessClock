@@ -42,9 +42,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   StepTurn _stepTurn = StepTurn.WHITE;
-
   bool _isPlaying = false;
   bool _isReset = false;
+  int _totalTime = Constants.fiveMinInMs;
 
   @override
   void initState() {
@@ -60,18 +60,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _togglePlaying() {
     setState(() {
+      _isReset = false;
       _isPlaying = !_isPlaying;
     });
   }
 
-  void _reset() {
+  void _reset(int time) {
     setState(() {
       _isPlaying = false;
       _stepTurn = StepTurn.WHITE;
       _isReset = true;
-    });
-    setState(() {
-      _isReset = false;
+      _totalTime = time;
     });
   }
 
@@ -98,26 +97,28 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 flex: 2,
                 child: SideCard(
-                  duration: 300000,
+                  duration: _totalTime,
                   isReset: _isReset,
                   textColor: Colors.black,
                   rotations: 2,
                   color: const Color(0xFFF2F2F2),
                   isPlaying: _isPlaying,
                   onTapped: _handleWhiteTurnCommit,
+                  onTimeIsOver: () => {_reset(_totalTime)},
                   isCurrentStep: _stepTurn == StepTurn.WHITE,
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: SideCard(
-                  duration: 300000,
+                  duration: _totalTime,
                   isReset: _isReset,
                   textColor: Colors.white,
                   rotations: 0,
                   color: const Color(0xFF1B1B1B),
                   isPlaying: _isPlaying,
                   onTapped: _handleBlackTurnCommit,
+                  onTimeIsOver: () => {_reset(_totalTime)},
                   isCurrentStep: _stepTurn == StepTurn.BLACK,
                 ),
               ),
@@ -148,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Icons.refresh_rounded,
                     color: const Color(0xFF28231F),
                   ),
-                  _reset,
+                  () => {_reset(_totalTime)},
                 ),
               ],
             ),
@@ -189,8 +190,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return CustomDialogBox(
           title: "Pick game duration",
           text: "Confirm",
-          currentTime: Constants.twoMinInMs,
-          onPicked: (value) => {},
+          currentTime: _totalTime,
+          onPicked: (value) => {_reset(value)},
         );
       },
     );

@@ -23,11 +23,16 @@ class CustomDialogBox extends StatefulWidget {
 }
 
 class _CustomDialogBoxState extends State<CustomDialogBox> {
-  int _pickedTime;
+  int _pickedTime = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTime(widget.currentTime);
+  }
 
   @override
   Widget build(BuildContext context) {
-    _updateTime(widget.currentTime);
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Constants.padding),
@@ -62,12 +67,13 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             },
             child: Container(
               padding: EdgeInsets.all(16),
+              decoration: _getDecoration(Constants.twoMinInMs),
               child: Text(
                 "2 min",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: _pickedTime == Constants.twoMinInMs
+                  color: _isCurrentTime(Constants.twoMinInMs)
                       ? Colors.blue
                       : Colors.grey,
                 ),
@@ -80,6 +86,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             },
             child: Container(
               padding: EdgeInsets.all(16),
+              decoration: _getDecoration(Constants.fiveMinInMs),
               child: Text(
                 "5 min",
                 style: TextStyle(
@@ -98,6 +105,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             },
             child: Container(
               padding: EdgeInsets.all(16),
+              decoration: _getDecoration(Constants.tenMinInMs),
               child: Text(
                 "10 min",
                 style: TextStyle(
@@ -143,5 +151,22 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     setState(() {
       _pickedTime = time;
     });
+  }
+
+  bool _isCurrentTime(int time) {
+    return _pickedTime == time;
+  }
+
+  Decoration _getDecoration(int time) {
+    return _isCurrentTime(time)
+        ? const ShapeDecoration(
+            color: const Color(0xFFD9D9D9),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+            ),
+          )
+        : null;
   }
 }
